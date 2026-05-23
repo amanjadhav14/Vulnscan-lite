@@ -27,9 +27,19 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# ─── CORS SECURITY CONFIGURATION ───
+# Explicitly listing domains resolves the wildcard vs credentials conflict
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://vulnscan-lite-6wk693qxb-amanjadhav14s-projects.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=origins,  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,7 +75,7 @@ class LoginRequest(BaseModel):
     password: str
 
 @app.post("/login")
-def login(request: Request, credentials: LoginRequest):  # Fixed: Request parameter injected
+def login(request: Request, credentials: LoginRequest):  
     if credentials.username == ADMIN_USERNAME and credentials.password == ADMIN_PASSWORD:
         return {
             "status": "authenticated",
@@ -101,7 +111,7 @@ def get_scan(task_id: str):
         return {"status": "Scanning"}
     elif task.state == "SUCCESS":
         result_data = task.result
-        
+
         try:
             target_url = result_data.get("url", "unknown_vector")
             calculated_grade = result_data.get("grade", "F")
@@ -110,13 +120,13 @@ def get_scan(task_id: str):
             
             conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
-            
+
             cursor.execute(
                 "SELECT id FROM scan_history WHERE url=? AND timestamp > datetime('now', '-5 second')", 
                 (target_url,)
             )
             already_logged = cursor.fetchone()
-            
+
             if not already_logged:
                 cursor.execute(
                     "INSERT INTO scan_history (url, grade, total_score, timestamp) VALUES (?, ?, ?, ?)",
@@ -124,7 +134,7 @@ def get_scan(task_id: str):
                 )
                 conn.commit()
                 logger.info(f"Persistent metrics recorded cleanly for target vector: {target_url}")
-                
+
             conn.close()
         except Exception as db_err:
             logger.error(f"Failed to record persistent timeline logs: {str(db_err)}")
@@ -142,7 +152,7 @@ def get_history():
         cursor.execute("SELECT id, url, grade, total_score, timestamp FROM scan_history ORDER BY id DESC")
         rows = cursor.fetchall()
         conn.close()
-        
+
         history_list = []
         for row in rows:
             history_list.append({
@@ -170,22 +180,21 @@ def remove_file(path: str):
 async def download_report(request: Request, background_tasks: BackgroundTasks, data: dict = Body(...)):
     filename = "security_report.pdf"
     try:
-        # Prevent errors if remediation blocks are empty or null
         if "remediation" not in data:
             data["remediation"] = data.get("reremediation", [])
         if data["remediation"] is None:
             data["remediation"] = []
-            
+
         logger.info(f"Compiling PDF Report payload data for target vector.")
         generate_pdf(data, filename)
-        
+
     except Exception as pdf_error:
         logger.error(f"Error inside pdf_generator backend: {str(pdf_error)}")
         raise HTTPException(status_code=500, detail=f"PDF Generator Error: {str(pdf_error)}")
     
     if not os.path.exists(filename):
         raise HTTPException(status_code=500, detail="Generated report file missing from transient storage.")
-        
+
     background_tasks.add_task(remove_file, filename)
     
     headers = {
