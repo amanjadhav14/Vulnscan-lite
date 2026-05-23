@@ -39,8 +39,8 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  
-    allow_credentials=True,
+    allow_origins=["*"],            # Allows any Vercel preview URL to connect safely
+    allow_credentials=False,        # Turning this off allows the wildcard * to work
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Disposition"]
