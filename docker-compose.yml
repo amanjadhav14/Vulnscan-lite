@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Task Queue Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: vulnscan_redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  # FastAPI Backend Service Engine
+  backend:
+    build: ./backend
+    container_name: vulnscan_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - VULNSCAN_USER=admin
+      - VULNSCAN_PASSWORD=admin
+    depends_on:
+      - redis
+    restart: always
+
+  # Asynchronous Background Scanning Workers
+  worker:
+    build: ./backend
+    container_name: vulnscan_celery_worker
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: always
+
+  # React Frontend Dashboard UI Layout Engine
+  frontend:
+    build: ./frontend
+    container_name: vulnscan_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    restart: always
