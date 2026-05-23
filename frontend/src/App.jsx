@@ -82,7 +82,7 @@ function App() {
   const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9][-a-zA-Z0-9]*[a-zA-Z0-9]\.)+[a-zA-Z]{2,}(\/.*)?$/;
 
 // Dynamic API URL Routing Layer
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://vulnscan-lite-ah64.onrender.com";
 
 // Update your existing network fetch calls to point to the dynamic layout:
 const fetchHistory = async () => {
