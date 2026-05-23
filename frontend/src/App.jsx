@@ -112,12 +112,31 @@ const handleLogin = async (e) => {
 };
 
 const startScan = async () => {
-  // ... check regex ...
+  // Clear any trailing spaces from the input variable
+  const targetUrl = url.trim();
+
+  if (!targetUrl) {
+    alert("Please enter a valid target URL.");
+    return;
+  }
+
   try {
-    // ... setup loader steps ...
-    const response = await axios.post(`${API_BASE_URL}/scan`, null, { params: { url: url } });
-    pollResult(response.data.task_id, logLoader);
+    setLoading(true);
+    setProgress(10); // Start the loading tracker animation instantly
+
+    // Explicitly pass the validated targetUrl string into the query parameters
+    const response = await axios.post(`${API_BASE_URL}/scan`, null, { 
+      params: { url: targetUrl } 
+    });
+
+    if (response.data && response.data.task_id) {
+      pollResult(response.data.task_id, logLoader);
+    } else {
+      setLoading(false);
+      alert("Failed to initialize scan engine tasks.");
+    }
   } catch (error) {
+    console.error("Scan dispatch error:", error);
     setLoading(false);
   }
 };
