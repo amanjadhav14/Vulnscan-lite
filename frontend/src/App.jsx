@@ -96,12 +96,30 @@ const fetchHistory = async () => {
 
 const handleLogin = async (e) => {
   e.preventDefault();
-  setAuthError("");
+
   try {
-    const response = await axios.post(`${API_BASE_URL}/login`, { username, password });
-    setIsAuthenticated(true);
-  } catch (error) {
-    setAuthError(error.response?.data?.detail || "Gateway connection rejected.");
+    const response = await axios.post(
+      "https://vulnscan-lite-ah64.onrender.com/login",
+      {
+        username,
+        password,
+      }
+    );
+
+    console.log(response.data);
+
+    if (response.data.status === "authenticated") {
+      localStorage.setItem("token", response.data.token);
+
+      setAuthenticated(true);
+
+      setError("");
+    } else {
+      setError("Gateway connection rejected.");
+    }
+  } catch (err) {
+    console.error(err);
+    setError("Gateway connection rejected.");
   }
 };
 
