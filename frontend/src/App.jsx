@@ -110,17 +110,20 @@ const startScan = async () => {
     alert("Invalid Target Vector Format.");
     return;
   }
-  try {
+ try {
     setLoading(true);
     setProgress(10);
-    
-    // This sends 'url' cleanly inside a standard query parameter string matching your backend validation
-      const response = await axios.post(
-  `${API_BASE_URL}/scan`, 
-  { url: String(url) }, 
-  { headers: { 'Content-Type': 'application/json' } }
-);
-   
+
+    // This converts the data format universally so FastAPI can process it smoothly
+    const params = new URLSearchParams();
+    params.append('url', url);
+
+    const response = await axios.post(`${API_BASE_URL}/scan`, params, {
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
     if (response.data && response.data.task_id) {
       pollResult(response.data.task_id);
     } else {
