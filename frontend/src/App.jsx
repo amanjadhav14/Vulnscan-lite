@@ -114,10 +114,14 @@ const startScan = async () => {
     setLoading(true);
     setProgress(10);
 
-    // This appends the url parameter directly to the string matching: start_scan(request: Request, url: str)
-    const response = await axios.post(`${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`);
+    // Sends the URL both as a query parameter and a JSON body to guarantee a match
+    const response = await axios.post(
+      `${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`, 
+      { url: url }
+    );
 
     if (response.data && response.data.task_id) {
+      // Start checking for results using the returned task ID
       pollResult(response.data.task_id);
     } else {
       setLoading(false);
@@ -126,7 +130,7 @@ const startScan = async () => {
   } catch (error) {
     setLoading(false);
     console.error("Scan dispatch error:", error);
-    alert(error.response?.data?.detail || "Network connection dropped.");
+    alert(error.response?.data?.detail || "Connection synchronization error.");
   }
 };
 
