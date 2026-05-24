@@ -132,15 +132,13 @@ const startScan = async () => {
     alert("Invalid Target Vector Format.");
     return;
   }
- try {
+try {
     setLoading(true);
     setProgress(10);
 
-    // This creates the exact nested structure: {"url": {"url": "https://..."}}
+    // Clean, standard JSON body post
     const response = await axios.post(`${API_BASE_URL}/scan`, {
-      url: {
-        url: url
-      }
+      url: url
     });
 
     if (response.data && response.data.task_id) {
