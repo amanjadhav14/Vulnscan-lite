@@ -67,7 +67,9 @@ const MatrixBackground = () => {
 };
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const [isAuthenticated, setIsAuthenticated] = useState(
+  localStorage.getItem("authenticated") === "true"
+);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
@@ -106,21 +108,23 @@ const handleLogin = async (e) => {
       }
     );
 
-    console.log(response.data);
+console.log(response.data);
 
-    if (response.data.status === "authenticated") {
-      localStorage.setItem("token", response.data.token);
+if (response.data.status === "authenticated") {
+  localStorage.setItem("token", response.data.token);
 
-      setAuthenticated(true);
+  setAuthenticated(true);
 
-      setError("");
-    } else {
-      setError("Gateway connection rejected.");
-    }
-  } catch (err) {
-    console.error(err);
-    setError("Gateway connection rejected.");
-  }
+  localStorage.setItem("authenticated", "true");
+
+  window.location.href = "/";
+} else {
+  setError("Gateway connection rejected.");
+}
+} catch (err) {
+  console.error(err);
+  setError("Gateway connection rejected.");
+}
 };
 
 const startScan = async () => {
