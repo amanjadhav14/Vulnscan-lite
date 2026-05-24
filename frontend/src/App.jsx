@@ -121,10 +121,12 @@ if (response.data.status === "authenticated") {
 } else {
   setError("Gateway connection rejected.");
 }
-} catch (err) {
-  console.error(err);
-  setError("Gateway connection rejected.");
-}
+} catch (error) {
+    console.error("Login failed:", error);
+    // Replace the broken setError line with a safe alert
+    alert("Authentication failed. Check your gateway configuration credentials.");
+    setLoading(false); // Make sure to turn off any loading indicators here
+  }
 };
 
 const startScan = async () => {

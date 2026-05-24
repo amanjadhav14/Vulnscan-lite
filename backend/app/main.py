@@ -41,7 +41,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Allows all origins temporarily so your submission works instantly
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
