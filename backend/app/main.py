@@ -74,6 +74,9 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class ScanRequest(BaseModel):
+    url: str
+
 @app.post("/login")
 def login(request: Request, credentials: LoginRequest):  
     if credentials.username == ADMIN_USERNAME and credentials.password == ADMIN_PASSWORD:

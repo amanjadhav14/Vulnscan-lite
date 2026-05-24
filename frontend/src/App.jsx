@@ -115,8 +115,12 @@ const startScan = async () => {
     setProgress(10);
     
     // This sends 'url' cleanly inside a standard query parameter string matching your backend validation
-    const response = await axios.post(`${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`);
-    
+      const response = await axios.post(
+  `${API_BASE_URL}/scan`, 
+  { url: String(url) }, 
+  { headers: { 'Content-Type': 'application/json' } }
+);
+   
     if (response.data && response.data.task_id) {
       pollResult(response.data.task_id);
     } else {
