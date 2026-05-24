@@ -99,44 +99,32 @@ const handleLogin = async (e) => {
   setAuthError("");
   try {
     const response = await axios.post(`${API_BASE_URL}/login`, { username, password });
-    if (response.data.status === "authenticated" || (username === "admin" && password === "admin")) {
-      setIsAuthenticated(true);
-    }
+    setIsAuthenticated(true);
   } catch (error) {
-    if (username === "admin" && password === "admin") {
-      setIsAuthenticated(true);
-    } else {
-      setAuthError(error.response?.data?.detail || "Gateway connection rejected.");
-    }
+    setAuthError(error.response?.data?.detail || "Gateway connection rejected.");
   }
 };
 
 const startScan = async () => {
-  // Clear any trailing spaces from the input variable
-  const targetUrl = url.trim();
-
-  if (!targetUrl) {
-    alert("Please enter a valid target URL.");
+  if (!urlRegex.test(url)) {
+    alert("Invalid Target Vector Format.");
     return;
   }
-
   try {
     setLoading(true);
-    setProgress(10); // Start the loading tracker animation instantly
-
-    // Explicitly pass the validated targetUrl string into the query parameters
-const response = await axios.post(`${API_BASE_URL}/scan`, JSON.stringify(url), {
-  headers: { 'Content-Type': 'application/json' }
-});
+    setProgress(10);
+    
+    // This sends 'url' cleanly inside a standard query parameter string matching your backend validation
+    const response = await axios.post(`${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`);
+    
     if (response.data && response.data.task_id) {
-      pollResult(response.data.task_id, logLoader);
+      pollResult(response.data.task_id);
     } else {
       setLoading(false);
-      alert("Failed to initialize scan engine tasks.");
     }
   } catch (error) {
-    console.error("Scan dispatch error:", error);
     setLoading(false);
+    console.error("Scan dispatch error:", error);
   }
 };
 
