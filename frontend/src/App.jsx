@@ -132,27 +132,25 @@ const startScan = async () => {
     alert("Invalid Target Vector Format.");
     return;
   }
-  try {
+ try {
     setLoading(true);
     setProgress(10);
 
-    // Sends the URL both as a query parameter and a JSON body to guarantee a match
-    const response = await axios.post(
-      `${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`, 
-      { url: url }
-    );
+    // This creates the exact nested structure: {"url": {"url": "https://..."}}
+    const response = await axios.post(`${API_BASE_URL}/scan`, {
+      url: {
+        url: url
+      }
+    });
 
     if (response.data && response.data.task_id) {
-      // Start checking for results using the returned task ID
       pollResult(response.data.task_id);
     } else {
       setLoading(false);
-      alert("Failed to initialize scan engine tasks.");
     }
   } catch (error) {
     setLoading(false);
     console.error("Scan dispatch error:", error);
-    alert(error.response?.data?.detail || "Connection synchronization error.");
   }
 };
 
