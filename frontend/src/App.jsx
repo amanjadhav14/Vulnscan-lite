@@ -136,7 +136,7 @@ try {
     setLoading(true);
     setProgress(10);
 
-    // Clean, standard JSON body post
+    // This sends the exact flat JSON structure that just succeeded in the curl test!
     const response = await axios.post(`${API_BASE_URL}/scan`, {
       url: url
     });
