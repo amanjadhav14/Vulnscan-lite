@@ -96,26 +96,13 @@ def home():
 
 # ─── START SCAN (RATE LIMITED: 5 per minute) ───
 @app.post("/scan")
-async def start_scan(request: Request, url: str = None):
-    # Fallback check in case it arrives in the request body instead
-    if not url:
-        try:
-            body = await request.json()
-            url = body.get("url")
-        except:
-            pass
+async def start_scan(scan: ScanRequest):
 
-    if not url:
-        raise HTTPException(status_code=422, detail="URL parameter is missing.")
-        
-    # Generate an instant tracking task ID for your frontend polling loop
-    mock_task_id = str(uuid.uuid4())
-    
-    # Return exactly what your React app needs to unlock the UI
+    task = run_scan.delay(scan.url)
+
     return {
-        "task_id": mock_task_id,
-        "status": "Processing",
-        "message": "Scan pipeline triggered successfully"
+        "task_id": task.id,
+        "status": "Queued"
     }
 
 # CHECK SCAN STATUS & PERSIST DATA
