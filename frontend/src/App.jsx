@@ -125,7 +125,9 @@ const startScan = async () => {
     setProgress(10); // Start the loading tracker animation instantly
 
     // Explicitly pass the validated targetUrl string into the query parameters
-const response = await axios.post(`${API_BASE_URL}/scan?url=${encodeURIComponent(url)}`);
+const response = await axios.post(`${API_BASE_URL}/scan`, JSON.stringify(url), {
+  headers: { 'Content-Type': 'application/json' }
+});
     if (response.data && response.data.task_id) {
       pollResult(response.data.task_id, logLoader);
     } else {
