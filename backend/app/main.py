@@ -133,7 +133,7 @@ async def start_scan(request: Request):
 @app.get("/scan/{task_id}")
 def get_scan(task_id: str):
 
-result_data = {
+    result_data = {
         "url": "https://google.com",
         "grade": "A",
         "total_score": 85,
