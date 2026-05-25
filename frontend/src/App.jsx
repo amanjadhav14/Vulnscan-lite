@@ -74,7 +74,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [target, setTarget] = useState("");
-
+  const [scanResult, setScanResult] = useState(null);
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -127,6 +127,7 @@ const startScan = async (e) => {
   try {
     setLoading(true);
 
+    // Start scan
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/scan",
       {
@@ -136,9 +137,33 @@ const startScan = async (e) => {
 
     console.log(response.data);
 
-    setProgress(100);
+    const taskId = response.data.task_id;
 
-    setLoading(false);
+    // Poll scan status
+    const interval = setInterval(async () => {
+      try {
+        const resultResponse = await axios.get(
+          `https://vulnscan-lite-ah64.onrender.com/scan/${taskId}`
+        );
+
+        console.log(resultResponse.data);
+
+        if (resultResponse.data.status === "Completed") {
+          clearInterval(interval);
+
+          setScanResult(resultResponse.data.result);
+
+          setLoading(false);
+
+          setProgress(100);
+        }
+
+      } catch (err) {
+        console.error(err);
+        clearInterval(interval);
+        setLoading(false);
+      }
+    }, 3000);
 
   } catch (error) {
     console.error(error);
@@ -169,7 +194,7 @@ const downloadPDF = async () => {
   }
 };
 
-  const chartData = result ? [{ name: "Score", score: result.total_score ?? 0, fill: "#00f0ff" }] : [];
+  const chartData = result ? [{ name: "Score", score: scanResult.total_score ?? 0, fill: "#00f0ff" }] : [];
 
   const getBarData = () => {
     if (!result) return [];
@@ -290,18 +315,35 @@ const downloadPDF = async () => {
             )}
           </AnimatePresence>
 
+          
+           {scanResult && (
+  <div className="text-cyan-400 mt-10">
+    <h2>SCAN RESULTS</h2>
+
+    <p>URL: {scanResult.url}</p>
+    <p>Grade: {scanResult.grade}</p>
+    <p>Score: {scanResult.total_score}</p>
+
+    <pre className="text-xs overflow-auto mt-4">
+      {JSON.stringify(scanResult, null, 2)}
+    </pre>
+  </div>
+)}
+
+
+
           {/* SYSTEM GRID MATRIX INTERFACE */}
           <div className="grid lg:grid-cols-12 gap-8 items-start flex-grow">
             
             {/* ─── LEFT PANEL WRAPPER: TELEMETRY GRAPHS & RECON CHARTS (7 / 12) ─── */}
             <div className="lg:col-span-7 flex flex-col gap-8">
-              {result ? (
+              {scanResult ? (
                 <>
                   {/* Performance Analysis Scorecards and Layout */}
                   <div className="grid sm:grid-cols-5 gap-8">
                     <div className="sm:col-span-2 bg-black/85 border-2 border-slate-800 rounded-xl p-6 flex flex-col justify-between items-center text-center cyber-panel-glow">
                       <span className="text-xs text-slate-400 font-bold tracking-widest uppercase self-start border-l-2 border-cyan-400 pl-2">// AUDIT THREAT DEGREE</span>
-                      <h2 className="text-8xl font-black text-cyan-400 cyber-glow-cyan my-3">{result.grade || "F"}</h2>
+                      <h2 className="text-8xl font-black text-cyan-400 cyber-glow-cyan my-3">{scanResult.grade || "F"}</h2>
                       
                       <div className="w-full h-32 flex items-center justify-center relative">
                         <ResponsiveContainer width="100%" height="100%">
@@ -309,7 +351,7 @@ const downloadPDF = async () => {
                             <RadialBar background clockWise dataKey="score" />
                           </RadialBarChart>
                         </ResponsiveContainer>
-                        <div className="absolute font-black text-2xl text-slate-100">{result.total_score ?? 0} <span className="text-xs text-slate-500 font-normal">PTS</span></div>
+                        <div className="absolute font-black text-2xl text-slate-100">{scanResult.total_score ?? 0} <span className="text-xs text-slate-500 font-normal">PTS</span></div>
                       </div>
 
                       <button onClick={downloadPDF} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-lg text-[11px] text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition-all flex items-center justify-center gap-2 font-black tracking-widest uppercase mt-3">
