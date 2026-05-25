@@ -103,10 +103,12 @@ const handleLogin = async (e) => {
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/login",
       {
-        username,
-        password,
+        username: username,
+        password: password,
       }
     );
+
+    console.log(response.data);
 
     if (response.data.status === "authenticated") {
       setIsAuthenticated(true);
@@ -207,7 +209,14 @@ const downloadPDF = async () => {
                 <label className="block text-xs text-slate-400 uppercase tracking-widest mb-2 font-bold">// IDENTITY ACCOUNT ID</label>
                 <div className="relative">
                   <FaUserShield className="absolute left-4 top-4.5 text-slate-500 text-base" />
-                  <input type="text" placeholder="admin" required className="w-full bg-slate-950 border-2 border-slate-800 rounded-lg pl-12 pr-4 py-4 text-sm focus:outline-none focus:border-cyan-400 text-slate-100 transition-colors" value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <input
+  type="text"
+  placeholder="admin"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+  required
+  className="w-full bg-slate-950 border-2 border-slate-800 rounded-lg pl-12 pr-4 py-4 text-white focus:border-cyan-400 outline-none"
+/>
                 </div>
               </div>
 
@@ -215,7 +224,14 @@ const downloadPDF = async () => {
                 <label className="block text-xs text-slate-400 uppercase tracking-widest mb-2 font-bold">// SECURE ACCESS KEYWORD</label>
                 <div className="relative">
                   <FaKey className="absolute left-4 top-4.5 text-slate-500 text-base" />
-                  <input type="password" placeholder="••••••••" required className="w-full bg-slate-950 border-2 border-slate-800 rounded-lg pl-12 pr-4 py-4 text-sm focus:outline-none focus:border-cyan-400 text-slate-100 transition-colors" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <input
+  type="password"
+  placeholder="••••••••"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+  className="w-full bg-slate-950 border-2 border-slate-800 rounded-lg pl-12 pr-4 py-4 text-white focus:border-cyan-400 outline-none"
+/>
                 </div>
               </div>
 
