@@ -96,42 +96,30 @@ const fetchHistory = async () => {
   }
 };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-
+const handleLogin = async () => {
   try {
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/login",
       {
-        username,
-        password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        username: username,
+        password: password,
       }
     );
 
     console.log(response.data);
 
     if (response.data.status === "authenticated") {
-      localStorage.setItem("authenticated", "true");
-
       localStorage.setItem("token", response.data.token);
 
       setIsAuthenticated(true);
 
       alert("Access Granted");
-
-      window.location.reload();
     } else {
       alert("Authentication failed");
     }
   } catch (err) {
     console.error(err);
-
-    alert("Authentication failed. Check your gateway configuration credentials.");
+    alert("Authentication failed");
   }
 };
 
