@@ -67,12 +67,13 @@ const MatrixBackground = () => {
 };
 
 function App() {
-const [isAuthenticated, setIsAuthenticated] = useState(
-  localStorage.getItem("authenticated") === "true"
+  const [isAuthenticated, setIsAuthenticated] = useState(
+  localStorage.getItem("token") ? true : false
 );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [target, setTarget] = useState("");
 
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -121,26 +122,29 @@ const handleLogin = async (e) => {
 };
 
 const startScan = async (e) => {
-    if (e) e.preventDefault();
-    try {
-      setLoading(true);
-      setProgress(100);
-      
-      // Direct DOM manipulation to hide the loading text and show the dashboard layout instantly
-      setTimeout(() => {
-        const loadingElement = document.querySelector('.loading-container') || document.body;
-        // Force unfreeze the view by manipulating UI text directly if elements exist
-        const telemetryText = document.body;
-        if(telemetryText) {
-          // This forcefully injects a success dashboard screen mock directly into the HTML container
-          window.location.reload(); 
-        }
-      }, 500);
+  if (e) e.preventDefault();
 
-    } catch (error) {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const response = await axios.post(
+      "https://vulnscan-lite-ah64.onrender.com/scan",
+      {
+        url: target,
+      }
+    );
+
+    console.log(response.data);
+
+    setProgress(100);
+
+    setLoading(false);
+
+  } catch (error) {
+    console.error(error);
+    setLoading(false);
+  }
+};
 
 const pollResult = (taskId, logLoader) => {
   const tracker = setInterval(async () => {
@@ -260,7 +264,12 @@ const downloadPDF = async () => {
             <div className="bg-black/80 border border-cyan-500/30 rounded-xl p-3 flex flex-col sm:flex-row gap-4 xl:w-auto w-full items-center backdrop-blur-md">
               <div className="relative w-full sm:w-[450px]">
                 <FaNetworkWired className="absolute left-4 top-4 text-slate-400 text-sm" />
-                <input type="text" placeholder="https://target-endpoint.com" className="w-full bg-slate-950 border-2 border-slate-800 rounded-lg pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-cyan-400 text-slate-200" value={url} onChange={(e) => setUrl(e.target.value)} />
+                 <input
+  type="text"
+  value={target}
+  onChange={(e) => setTarget(e.target.value)}
+  placeholder="https://target-endpoint.com"
+/>
               </div>
               <button onClick={startScan} disabled={loading} className="w-full sm:w-auto px-6 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-widest text-xs rounded-lg disabled:opacity-40 transition-all whitespace-nowrap">
                 {loading ? "FETCHING TELEMETRY..." : "EXECUTE TARGET RECON ANALYSIS"}
