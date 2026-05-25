@@ -37,11 +37,12 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://vulnscan-lite-3oa2tyqem-amanjadhav14s-projects.vercel.app",
+    "https://vulnscan-lite-b0vjg1dc8-amanjadhav14s-projects.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins temporarily so your submission works instantly
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
