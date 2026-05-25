@@ -96,24 +96,20 @@ const fetchHistory = async () => {
   }
 };
 
-const handleLogin = async () => {
+const handleLogin = async (e) => {
+  e.preventDefault();
+
   try {
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/login",
       {
-        username: username,
-        password: password,
+        username,
+        password,
       }
     );
 
-    console.log(response.data);
-
     if (response.data.status === "authenticated") {
-      localStorage.setItem("token", response.data.token);
-
       setIsAuthenticated(true);
-
-      alert("Access Granted");
     } else {
       alert("Authentication failed");
     }
