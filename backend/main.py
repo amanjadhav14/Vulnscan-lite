@@ -36,16 +36,14 @@ origins = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://vulnscan-lite-6jvll98b-amanjadhav14s-projects.vercel.app",
     "https://vulnscan-lite-3oa2tyqem-amanjadhav14s-projects.vercel.app",
     "https://vulnscan-lite-b0vjg1dc8-amanjadhav14s-projects.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://vulnscan-lite-8z738cqrm-amanjadhav14s-projects.vercel.app",
-        "http://localhost:5173",
-    ],
+    allow_origin_regex="https://.*vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
