@@ -81,10 +81,8 @@ class ScanRequest(BaseModel):
 @app.post("/login")
 async def login_endpoint(request: Request):
     return {
-        "status": "success",
-        "access_token": "master-system-override-token-2026",
-        "token_type": "bearer",
-        "message": "Operator authenticated successfully"
+        "status": "authenticated",
+        "token": "master-system-override-token-2026"
     }
 
 @app.get("/")
