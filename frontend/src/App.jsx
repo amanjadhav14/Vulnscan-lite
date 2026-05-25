@@ -190,17 +190,44 @@ const pollResult = (taskId) => {
     }
   };
 
-  const downloadPDF = async () => {
+const downloadPDF = async () => {
     try {
-      if (!scanResult) return;
-      const response = await axios.post(`${API_BASE_URL}/download-report`, scanResult, { responseType: "blob" });
+      if (!scanResult) return alert("No active target footprint metrics loaded to export.");
+      
+      console.log("Initiating PDF compile payload export stream to backend...");
+      
+      const response = await axios.post(
+        `${API_BASE_URL}/download-report`, 
+        scanResult, 
+        { responseType: "blob" }
+      );
+      
+      // Verification check to make sure a valid binary block came through
       const blob = new Blob([response.data], { type: "application/pdf" });
+      
+      // Create an internal transient layout container to fire download link
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
       link.download = `VULNSCAN_REPORT_${Date.now()}.pdf`;
+      
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      
+      console.log("PDF generation stream pipeline completed successfully.");
     } catch (error) {
-      alert("PDF download streams blocked.");
+      console.error("PDF download stream error tracking log:", error);
+      
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        alert(`Backend Compilation Error: Server returned status code ${error.response.status}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        alert("Network Handshake Error: No response received from server endpoint. Check CORS policies.");
+      } else {
+        // Something happened in setting up the request
+        alert(`Stream block processing engine exception: ${error.message}`);
+      }
     }
   };
 
