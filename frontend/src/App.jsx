@@ -394,8 +394,8 @@ const downloadPDF = async () => {
                   <div className="bg-black/75 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// RECORD MATRIX DNS ENTRIES</span>
                     <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                      {result.dns_records && Object.keys(result.dns_records).length > 0 ? (
-                        Object.entries(result.dns_records).map(([type, records]) => records && records.length > 0 && (
+                      {result?.dns_records && Object.keys(result.dns_records).length > 0 ? (
+                        Object.entries(result?.dns_records || {}).map(([type, records]) => records && records.length > 0 && (
                           <div key={type} className="bg-slate-950 border border-slate-900 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4">
                             <div className="px-3 py-1.5 bg-cyan-950/60 border border-cyan-500/40 rounded text-cyan-400 font-black text-xs min-w-[70px] text-center uppercase tracking-wider">{type}</div>
                             <div className="flex-grow space-y-1.5 overflow-x-auto">
@@ -455,7 +455,7 @@ const downloadPDF = async () => {
                   <div className="bg-black/60 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// TARGET OPEN LISTENING PORTS LOG ENTRY MAP</span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                      {result.ports?.length > 0 ? result.ports.map((p, i) => (
+                      {result?.ports?.length > 0 ? result.ports.map((p, i) => (
                         <div key={i} className="bg-slate-950 border-2 border-slate-900 rounded-xl p-4 relative overflow-hidden">
                           <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                           <div className="text-sm font-black text-cyan-400">PORT: {p.port}</div>
@@ -480,8 +480,8 @@ const downloadPDF = async () => {
                 <div className="bg-black/85 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                   <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-l-2 border-cyan-400 pl-2"><FaSearch className="text-xs" /> HOST INFRASTRUCTURE WHOIS DOSSIER</h3>
                   <div className="bg-slate-950 border-2 border-slate-900 rounded-xl p-4 font-mono text-[11px] leading-relaxed max-h-56 overflow-y-auto text-slate-300 space-y-1 scrollbar-thin select-all">
-                    {result.whois ? (
-                      Object.entries(result.whois).map(([key, val]) => (
+                    {result?.whois ? (
+                      Object.entries(result?.whois || {}).map(([key, val]) => (
                         <div key={key} className="truncate"><span className="text-slate-500 uppercase font-bold">{key.replace(/_/g, ' ')}:</span> <span className="text-cyan-300 font-semibold">{Array.isArray(val) ? val.join(', ') : String(val || 'N/A')}</span></div>
                       ))
                     ) : (
@@ -496,7 +496,7 @@ const downloadPDF = async () => {
                 <div className="bg-black/85 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                   <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-l-2 border-cyan-400 pl-2"><FaUnlockAlt className="text-sm" /> SECURITY RECOMMENDATIONS & DEFENSIVE REMEDIATIONS</h3>
                   <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
-                    {result.remediation && result.remediation.length > 0 ? result.remediation.map((item, index) => (
+                    {result?.remediation?.length > 0 ? result.remediation.map((item, index) => (
                       <div key={index} className="bg-slate-950 border border-slate-900 rounded-xl p-4 space-y-3 text-xs leading-relaxed">
                         <div className="flex justify-between items-center border-b border-slate-900 pb-2">
                           <h4 className="font-bold text-slate-100 text-sm tracking-tight">{item.header} Configuration</h4>

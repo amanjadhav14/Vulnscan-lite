@@ -133,36 +133,84 @@ async def start_scan(request: Request):
 @app.get("/scan/{task_id}")
 def get_scan(task_id: str):
 
-    result_data = {
-        "url": "https://google.com",
-        "grade": "A",
-        "total_score": 85,
+result_data = {
+    "url": "https://google.com",
+    "grade": "A",
+    "total_score": 85,
 
-        "technologies": [
-            "React",
-            "FastAPI",
-            "Nginx",
-            "Cloudflare"
+    "technologies": [
+        "React",
+        "FastAPI",
+        "Nginx",
+        "Cloudflare"
+    ],
+
+    "subdomains": [
+        "api.google.com",
+        "mail.google.com"
+    ],
+
+    "dns_records": {
+        "A": ["142.250.183.14"],
+        "MX": ["smtp.google.com"]
+    },
+
+    "headers": {
+        "passed": [
+            "X-Frame-Options",
+            "Content-Security-Policy"
         ],
-
-        "subdomains": [
-            "api.google.com",
-            "mail.google.com"
-        ],
-
-        "vulnerabilities": [
-            {
-                "severity": "Low",
-                "title": "Missing Security Headers",
-                "description": "X-Frame-Options header not configured strictly."
-            },
-            {
-                "severity": "Medium",
-                "title": "Information Disclosure",
-                "description": "Server header leaks backend tech stack signatures."
-            }
+        "failed": [
+            "Strict-Transport-Security"
         ]
-    }
+    },
+
+    "cms": {
+        "cms": "Custom Stack",
+        "server": "nginx"
+    },
+
+    "ssl": {
+        "ssl_valid": True,
+        "days_left": 120
+    },
+
+    "ports": [
+        {
+            "port": 80,
+            "service": "HTTP",
+            "status": "open"
+        },
+        {
+            "port": 443,
+            "service": "HTTPS",
+            "status": "open"
+        }
+    ],
+
+    "whois": {
+        "registrar": "Google LLC",
+        "creation_date": "1997-09-15"
+    },
+
+    "remediation": [
+        "Enable HSTS headers",
+        "Harden CSP configuration"
+    ],
+
+    "vulnerabilities": [
+        {
+            "severity": "Low",
+            "title": "Missing Security Headers",
+            "description": "X-Frame-Options header not configured strictly."
+        },
+        {
+            "severity": "Medium",
+            "title": "Information Disclosure",
+            "description": "Server header leaks backend tech stack signatures."
+        }
+    ]
+}
 
     try:
         conn = sqlite3.connect(DB_PATH)
