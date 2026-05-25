@@ -80,12 +80,20 @@ class ScanRequest(BaseModel):
 
 @app.post("/login")
 async def login_endpoint(request: Request):
-    return {
-        "status": "success",
-        "access_token": "master-system-override-token-2026",
-        "token_type": "bearer",
-        "message": "Operator authenticated successfully"
-    }
+
+    body = await request.json()
+
+    username = body.get("username")
+    password = body.get("password")
+
+    if username == "admin" and password == "admin":
+        return {
+            "success": True,
+            "token": "master-system-override-token-2026",
+            "message": "Authentication successful"
+        }
+
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @app.get("/")
 def home():
