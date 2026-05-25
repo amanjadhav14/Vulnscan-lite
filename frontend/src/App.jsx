@@ -121,17 +121,14 @@ const handleLogin = async (e) => {
   }
 };
 
-const startScan = async (e) => {
-  if (e) e.preventDefault();
-
+const startScan = async () => {
   try {
     setLoading(true);
 
-    // Start scan
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/scan",
       {
-        url: target,
+        url: target
       }
     );
 
@@ -139,34 +136,18 @@ const startScan = async (e) => {
 
     const taskId = response.data.task_id;
 
-    // Poll scan status
-    const interval = setInterval(async () => {
-      try {
-        const resultResponse = await axios.get(
-          `https://vulnscan-lite-ah64.onrender.com/scan/${taskId}`
-        );
+    const scanResponse = await axios.get(
+      `https://vulnscan-lite-ah64.onrender.com/scan/${taskId}`
+    );
 
-        console.log(resultResponse.data);
+    console.log(scanResponse.data);
 
-        if (resultResponse.data.status === "Completed") {
-          clearInterval(interval);
+    setScanResult(scanResponse.data.result);
 
-          setScanResult(resultResponse.data.result);
+    setLoading(false);
 
-          setLoading(false);
-
-          setProgress(100);
-        }
-
-      } catch (err) {
-        console.error(err);
-        clearInterval(interval);
-        setLoading(false);
-      }
-    }, 3000);
-
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     setLoading(false);
   }
 };
