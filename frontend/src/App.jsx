@@ -375,7 +375,7 @@ const downloadPDF = async () => {
                   <div className="bg-black/75 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// INFRASTRUCTURE TECHNOLOGY LOG PRINT STACK</span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {result.technologies && result.technologies.length > 0 ? result.technologies.map((tech, i) => (
+                       {result?.technologies?.length > 0 ? result.technologies.map((tech, i) => (
                         <div key={i} className="bg-slate-950 border-2 border-slate-900 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
                           <div className="absolute top-2 right-2 text-slate-800"><FaCode className="text-xs" /></div>
                           <div className="text-xs font-black text-slate-400 uppercase tracking-wider">{tech.categories?.[0] || "LAYER"}</div>
