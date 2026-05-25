@@ -306,7 +306,6 @@ const downloadPDF = async () => {
     <p>Score: {scanResult.total_score}</p>
 
     <pre className="text-xs overflow-auto mt-4">
-      {JSON.stringify(scanResult, null, 2)}
     </pre>
   </div>
 )}
