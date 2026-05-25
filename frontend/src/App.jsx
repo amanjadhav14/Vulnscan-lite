@@ -316,46 +316,120 @@ const downloadPDF = async () => {
           <div className="grid lg:grid-cols-12 gap-8 items-start flex-grow">
             
             {/* ─── LEFT PANEL WRAPPER: TELEMETRY GRAPHS & RECON CHARTS (7 / 12) ─── */}
-            <div className="lg:col-span-7 flex flex-col gap-8">
-              {scanResult ? (
-                <>
-                  {/* Performance Analysis Scorecards and Layout */}
-                  <div className="grid sm:grid-cols-5 gap-8">
-                    <div className="sm:col-span-2 bg-black/85 border-2 border-slate-800 rounded-xl p-6 flex flex-col justify-between items-center text-center cyber-panel-glow">
-                      <span className="text-xs text-slate-400 font-bold tracking-widest uppercase self-start border-l-2 border-cyan-400 pl-2">// AUDIT THREAT DEGREE</span>
-                      <h2 className="text-8xl font-black text-cyan-400 cyber-glow-cyan my-3">{scanResult.grade || "F"}</h2>
-                      
-                      <div className="w-full h-32 flex items-center justify-center relative">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RadialBarChart innerRadius="78%" outerRadius="105%" data={chartData} startAngle={180} endAngle={0}>
-                            <RadialBar background clockWise dataKey="score" />
-                          </RadialBarChart>
-                        </ResponsiveContainer>
-                        <div className="absolute font-black text-2xl text-slate-100">{scanResult.total_score ?? 0} <span className="text-xs text-slate-500 font-normal">PTS</span></div>
-                      </div>
+<div className="lg:col-span-7 flex flex-col gap-8">
+  {scanResult ? (
+    <>
+      {/* Performance Analysis Scorecards and Layout */}
+      <div className="grid sm:grid-cols-5 gap-8">
 
-                      <button onClick={downloadPDF} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-lg text-[11px] text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition-all flex items-center justify-center gap-2 font-black tracking-widest uppercase mt-3">
-                        <FaDownload /> EXPORT DEFENSIVE SYSTEM REPORT
-                      </button>
-                    </div>
+        <div className="sm:col-span-2 bg-black/85 border-2 border-slate-800 rounded-xl p-6 flex flex-col justify-between items-center text-center cyber-panel-glow">
+          <span className="text-xs text-slate-400 font-bold tracking-widest uppercase self-start border-l-2 border-cyan-400 pl-2">
+            // AUDIT THREAT DEGREE
+          </span>
 
-                    <div className="sm:col-span-3 bg-black/85 border-2 border-slate-800 rounded-xl p-6 flex flex-col justify-between cyber-panel-glow">
-                      <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// AUDITED FRAME METRICS</span>
-                      <div className="w-full h-44">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={getBarData()} margin={{ left: -20, right: 10, bottom: 0 }}>
-                            <CartesianGrid stroke="#1e293b" vertical={false} strokeDasharray="4 4" />
-                            <XAxis dataKey="name" stroke="#64748b" fontSize={11} fontWeight="bold" tickLine={false} />
-                            <YAxis stroke="#64748b" fontSize={11} fontWeight="bold" allowDecimals={false} tickLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: '#020617', borderColor: '#475569', borderRadius: '8px', fontSize: '13px' }} />
-                            <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={42}>
-                              {getBarData().map((entry, index) => <Cell key={index} fill={entry.fill} />)}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  </div>
+          <h2 className="text-8xl font-black text-cyan-400 cyber-glow-cyan my-3">
+            {scanResult.grade || "F"}
+          </h2>
+
+          <div className="w-full h-32 flex items-center justify-center relative">
+
+            {scanResult ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <RadialBarChart
+                  innerRadius="78%"
+                  outerRadius="105%"
+                  data={chartData}
+                  startAngle={180}
+                  endAngle={0}
+                >
+                  <RadialBar background clockWise dataKey="score" />
+                </RadialBarChart>
+              </ResponsiveContainer>
+            ) : null}
+
+            <div className="absolute font-black text-2xl text-slate-100">
+              {scanResult.total_score ?? 0}
+              <span className="text-xs text-slate-500 font-normal">
+                {" "}PTS
+              </span>
+            </div>
+
+          </div>
+
+          <button
+            onClick={downloadPDF}
+            className="w-full py-3 bg-slate-950 border border-slate-800 rounded-lg text-[11px] text-slate-400 hover:text-cyan-400 hover:border-cyan-400 transition-all flex items-center justify-center gap-2 font-bold"
+          >
+            <FaDownload />
+            EXPORT DEFENSIVE SYSTEM REPORT
+          </button>
+        </div>
+
+        <div className="sm:col-span-3 bg-black/85 border-2 border-slate-800 rounded-xl p-6 flex flex-col justify-between cyber-panel-glow">
+          <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">
+            // AUDITED FRAME METRICS
+          </span>
+
+          <div className="w-full h-44">
+
+            {scanResult ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={getBarData()}
+                  margin={{ left: -20, right: 10, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    stroke="#1e293b"
+                    vertical={false}
+                    strokeDasharray="4 4"
+                  />
+
+                  <XAxis
+                    dataKey="name"
+                    stroke="#64748b"
+                    fontSize={11}
+                    fontWeight="bold"
+                    tickLine={false}
+                  />
+
+                  <YAxis
+                    stroke="#64748b"
+                    fontSize={11}
+                    fontWeight="bold"
+                    allowDecimals={false}
+                    tickLine={false}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#020617',
+                      borderColor: '#475569',
+                      borderRadius: '8px',
+                      fontSize: '13px'
+                    }}
+                  />
+
+                  <Bar
+                    dataKey="count"
+                    radius={[4, 4, 0, 0]}
+                    barSize={42}
+                  >
+                    {getBarData().map((entry, index) => (
+                      <Cell key={index} fill={entry.fill} />
+                    ))}
+                  </Bar>
+
+                </BarChart>
+              </ResponsiveContainer>
+            ) : null}
+
+          </div>
+        </div>
+
+      </div>
+    </>
+  ) : null}
+</div>
 
                   {/* RESTORED MODULE 1: SUBDOMAINS ARCHITECTURE IDENTIFICATION */}
                   <div className="bg-black/75 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
