@@ -180,8 +180,8 @@ const downloadPDF = async () => {
   const getBarData = () => {
     if (!result) return [];
     return [
-      { name: "Passed Audits", count: result.headers?.passed?.length ?? 0, fill: "#10b981" },
-      { name: "Missing Headers", count: result.headers?.failed?.length ?? 0, fill: "#ef4444" },
+      { name: "Passed Audits", count: result?.headers?.passed?.length ?? 0, fill: "#10b981" },
+      { name: "Missing Headers", count: result?.headers?.failed?.length ?? 0, fill: "#ef4444" },
       { name: "Discovered Subdomains", count: result?.subdomains?.length ?? 0, fill: "#00f0ff" }
     ];
   };
@@ -394,7 +394,7 @@ const downloadPDF = async () => {
                   <div className="bg-black/75 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// RECORD MATRIX DNS ENTRIES</span>
                     <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                      {result?.dns_records && Object.keys(result.dns_records).length > 0 ? (
+                      {result?.dns_records && Object.keys(result?.dns_records || {}).length > 0 ? (
                         Object.entries(result?.dns_records || {}).map(([type, records]) => records && records.length > 0 && (
                           <div key={type} className="bg-slate-950 border border-slate-900 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-4">
                             <div className="px-3 py-1.5 bg-cyan-950/60 border border-cyan-500/40 rounded text-cyan-400 font-black text-xs min-w-[70px] text-center uppercase tracking-wider">{type}</div>
@@ -414,7 +414,7 @@ const downloadPDF = async () => {
                     <div className="bg-slate-900/40 border-2 border-slate-800/90 rounded-xl p-5">
                       <h3 className="text-sm font-bold text-emerald-400 flex items-center gap-2 mb-4 uppercase tracking-wider"><FaCheckCircle className="text-base" /> Compliant Header Configs</h3>
                       <div className="space-y-2 text-xs">
-                        {result.headers?.passed?.map((h, i) => (
+                        {result?.headers?.passed?.map((h, i) => (
                           <div key={i} className="p-3 bg-emerald-950/20 border border-emerald-900/60 rounded text-emerald-300 font-bold">✓ {h}</div>
                         )) || <div className="text-slate-600 italic">No verified response parameters observed.</div>}
                       </div>
@@ -423,7 +423,7 @@ const downloadPDF = async () => {
                     <div className="bg-slate-900/40 border-2 border-slate-800/90 rounded-xl p-5">
                       <h3 className="text-sm font-bold text-rose-400 flex items-center gap-2 mb-4 uppercase tracking-wider"><FaTimesCircle className="text-base" /> Missing Security Headers</h3>
                       <div className="space-y-2 text-xs">
-                        {result.headers?.failed?.map((h, i) => (
+                        {result?.headers?.failed?.map((h, i) => (
                           <div key={i} className="p-3 bg-rose-950/20 border border-rose-900/60 rounded text-rose-300 font-bold">⚠️ {h}</div>
                         )) || <div className="text-emerald-400 font-bold p-3 bg-emerald-950/10 rounded border border-emerald-900/30">✓ Absolute compliance observed.</div>}
                       </div>
@@ -436,8 +436,8 @@ const downloadPDF = async () => {
                       <FaServer className="text-2xl text-amber-500 mt-1" />
                       <div className="w-full text-xs space-y-2">
                         <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider">CMS Verification Framework</h4>
-                        <div className="flex justify-between border-b border-slate-900 py-1.5"><span className="text-slate-500 font-bold">ENGINE:</span> <span className="text-slate-200 font-bold">{result.cms?.cms || "Obscured"}</span></div>
-                        <div className="flex justify-between py-1.5"><span className="text-slate-500 font-bold">SERVER BANNER:</span> <span className="text-slate-200 truncate max-w-[200px] font-bold">{result.cms?.server || "Unknown"}</span></div>
+                        <div className="flex justify-between border-b border-slate-900 py-1.5"><span className="text-slate-500 font-bold">ENGINE:</span> <span className="text-slate-200 font-bold">{result?.cms?.cms || "Obscured"}</span></div>
+                        <div className="flex justify-between py-1.5"><span className="text-slate-500 font-bold">SERVER BANNER:</span> <span className="text-slate-200 truncate max-w-[200px] font-bold">{result?.cms?.server || "Unknown"}</span></div>
                       </div>
                     </div>
 
@@ -445,8 +445,8 @@ const downloadPDF = async () => {
                       <FaLock className="text-2xl text-cyan-500 mt-1" />
                       <div className="w-full text-xs space-y-2">
                         <h4 className="text-sm font-bold text-cyan-400 uppercase tracking-wider">Cryptographic Sockets (SSL)</h4>
-                        <div className="flex justify-between border-b border-slate-900 py-1.5"><span className="text-slate-500 font-bold">CHAIN:</span> <span className={result.ssl?.ssl_valid ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>{result.ssl?.ssl_valid ? "VALID INFRASTRUCTURE" : "REVOKED"}</span></div>
-                        <div className="flex justify-between py-1.5"><span className="text-slate-500 font-bold">TIMELINE:</span> <span className="text-cyan-300 font-bold">{result.ssl?.days_left ?? 0} Days Left</span></div>
+                        <div className="flex justify-between border-b border-slate-900 py-1.5"><span className="text-slate-500 font-bold">CHAIN:</span> <span className={result?.ssl?.ssl_valid ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>{result?.ssl?.ssl_valid ? "VALID INFRASTRUCTURE" : "REVOKED"}</span></div>
+                        <div className="flex justify-between py-1.5"><span className="text-slate-500 font-bold">TIMELINE:</span> <span className="text-cyan-300 font-bold">{result?.ssl?.days_left ?? 0} Days Left</span></div>
                       </div>
                     </div>
                   </div>
@@ -455,7 +455,7 @@ const downloadPDF = async () => {
                   <div className="bg-black/60 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// TARGET OPEN LISTENING PORTS LOG ENTRY MAP</span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                      {result?.ports?.length > 0 ? result.ports.map((p, i) => (
+                      {result?.ports?.length > 0 ? result?.ports?.map((p, i) => (
                         <div key={i} className="bg-slate-950 border-2 border-slate-900 rounded-xl p-4 relative overflow-hidden">
                           <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                           <div className="text-sm font-black text-cyan-400">PORT: {p.port}</div>
@@ -496,7 +496,7 @@ const downloadPDF = async () => {
                 <div className="bg-black/85 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                   <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-l-2 border-cyan-400 pl-2"><FaUnlockAlt className="text-sm" /> SECURITY RECOMMENDATIONS & DEFENSIVE REMEDIATIONS</h3>
                   <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
-                    {result?.remediation?.length > 0 ? result.remediation.map((item, index) => (
+                    {result?.remediation?.length > 0 ? result?.remediation?.map((item, index) => (
                       <div key={index} className="bg-slate-950 border border-slate-900 rounded-xl p-4 space-y-3 text-xs leading-relaxed">
                         <div className="flex justify-between items-center border-b border-slate-900 pb-2">
                           <h4 className="font-bold text-slate-100 text-sm tracking-tight">{item.header} Configuration</h4>
