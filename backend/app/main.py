@@ -133,36 +133,36 @@ async def start_scan(request: Request):
 @app.get("/scan/{task_id}")
 def get_scan(task_id: str):
 
-result_data = {
-    "url": "https://google.com",
-    "grade": "A",
-    "total_score": 85,
+    result_data = {
+        "url": "https://google.com",
+        "grade": "A",
+        "total_score": 85,
 
-    "technologies": [
-        "React",
-        "FastAPI",
-        "Nginx",
-        "Cloudflare"
-    ],
+        "technologies": [
+            "React",
+            "FastAPI",
+            "Nginx",
+            "Cloudflare"
+        ],
 
-    "subdomains": [
-        "api.google.com",
-        "mail.google.com"
-    ],
+        "subdomains": [
+            "api.google.com",
+            "mail.google.com"
+        ],
 
-    "vulnerabilities": [
-        {
-            "severity": "Low",
-            "title": "Missing Security Headers",
-            "description": "X-Frame-Options header not configured strictly."
-        },
-        {
-            "severity": "Medium",
-            "title": "Information Disclosure",
-            "description": "Server header leaks backend tech stack signatures."
-        }
-    ]
-}
+        "vulnerabilities": [
+            {
+                "severity": "Low",
+                "title": "Missing Security Headers",
+                "description": "X-Frame-Options header not configured strictly."
+            },
+            {
+                "severity": "Medium",
+                "title": "Information Disclosure",
+                "description": "Server header leaks backend tech stack signatures."
+            }
+        ]
+    }
 
     try:
         conn = sqlite3.connect(DB_PATH)
