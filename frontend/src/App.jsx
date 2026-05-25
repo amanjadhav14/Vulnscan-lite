@@ -113,11 +113,12 @@ function App() {
     }
   };
 
-  const pollResult = (taskId) => {
+const pollResult = (taskId) => {
     let currentProgress = 10;
     setProgress(currentProgress);
     setLoadingText("Establishing remote footprint channel connection...");
 
+    // 1. Progress simulator increment rules
     const logLoader = setInterval(() => {
       currentProgress = Math.min(currentProgress + Math.floor(Math.random() * 12) + 2, 95);
       setProgress(currentProgress);
@@ -128,17 +129,24 @@ function App() {
       }
     }, 800);
 
+    // 2. Active backend verification tracker loop
     const tracker = setInterval(async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/scan/${taskId}`);
-        if (response.data && response.data.status === "completed") {
+        const data = response.data;
+
+        // FIXED: Flexible check that matches standard wrapper OR direct data payloads
+        if (data && (data.status === "completed" || data.result || data.total_score !== undefined)) {
           clearInterval(logLoader);
           clearInterval(tracker);
           setProgress(100);
-          setScanResult(response.data.result);
+          
+          // Fallback extraction check to grab data no matter how the API structures it
+          const finalResult = data.result || data;
+          setScanResult(finalResult);
           setLoading(false);
-          fetchHistory();
-        } else if (response.data && response.data.status === "failed") {
+          fetchHistory(); // Sync up bottom history window panel instantly
+        } else if (data && data.status === "failed") {
           clearInterval(logLoader);
           clearInterval(tracker);
           setLoading(false);
