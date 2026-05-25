@@ -182,7 +182,7 @@ const downloadPDF = async () => {
     return [
       { name: "Passed Audits", count: result.headers?.passed?.length ?? 0, fill: "#10b981" },
       { name: "Missing Headers", count: result.headers?.failed?.length ?? 0, fill: "#ef4444" },
-      { name: "Discovered Subdomains", count: result.subdomains?.length ?? 0, fill: "#00f0ff" }
+      { name: "Discovered Subdomains", count: result?.subdomains?.length ?? 0, fill: "#00f0ff" }
     ];
   };
 
@@ -362,7 +362,7 @@ const downloadPDF = async () => {
                   <div className="bg-black/75 border-2 border-slate-800 rounded-xl p-6 cyber-panel-glow">
                     <span className="text-xs text-slate-400 font-bold tracking-widest uppercase block mb-4 border-l-2 border-cyan-400 pl-2">// DISCOVERED CLOUD SUBDOMAINS VECTOR INDEX</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-1">
-                      {result.subdomains && result.subdomains.length > 0 ? result.subdomains.map((sub, i) => (
+                       {result?.subdomains && result?.subdomains.length > 0 ? result?.subdomains.map((sub, i) => (
                         <div key={i} className="p-3 bg-slate-950 border border-slate-900 rounded-lg flex items-center gap-2.5 text-xs font-bold text-cyan-300">
                           <FaGlobe className="text-slate-500 text-sm shrink-0" />
                           <span className="truncate selection:bg-cyan-500 selection:text-black">{sub}</span>
