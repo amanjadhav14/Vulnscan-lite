@@ -278,13 +278,22 @@ def remove_file(path: str):
 async def download_report(request: Request, background_tasks: BackgroundTasks, data: dict = Body(...)):
     filename = "security_report.pdf"
     try:
-        if "remediation" not in data:
-            data["remediation"] = data.get("reremediation", [])
-        if data["remediation"] is None:
-            data["remediation"] = []
+        # FIX: Extract the actual payload if it's wrapped inside a "result" key
+        if "result" in data and isinstance(data["result"], dict):
+            report_data = data["result"]
+        else:
+            report_data = data
+
+        # Ensure remediation field parsing targets the correct extracted dictionary
+        if "remediation" not in report_data:
+            report_data["remediation"] = report_data.get("reremediation", [])
+        if report_data["remediation"] is None:
+            report_data["remediation"] = []
 
         logger.info(f"Compiling PDF Report payload data for target vector.")
-        generate_pdf(data, filename)
+        
+        # FIX: Pass the unwrapped report_data dictionary into your generator
+        generate_pdf(report_data, filename)
 
     except Exception as pdf_error:
         logger.error(f"Error inside pdf_generator backend: {str(pdf_error)}")
