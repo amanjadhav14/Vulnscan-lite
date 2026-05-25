@@ -103,18 +103,17 @@ const handleLogin = async (e) => {
     const response = await axios.post(
       "https://vulnscan-lite-ah64.onrender.com/login",
       {
-        username: username,
-        password: password,
+        username,
+        password,
       }
     );
 
     console.log(response.data);
 
-    if (response.data.status === "authenticated") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Authentication failed");
-    }
+    localStorage.setItem("token", response.data.token);
+
+    setIsAuthenticated(true);
+
   } catch (err) {
     console.error(err);
     alert("Authentication failed");
