@@ -68,8 +68,8 @@ def init_db():
 init_db()
 
 # ─── AUTHENTICATION SCHEMAS & CONFIG ───
-ADMIN_USERNAME = os.getenv("VULNSCAN_USER", "admin")
-ADMIN_PASSWORD = os.getenv("VULNSCAN_PASSWORD", "admin")
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin"
 
 class LoginRequest(BaseModel):
     username: str
