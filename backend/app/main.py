@@ -278,26 +278,55 @@ def remove_file(path: str):
 async def download_report(request: Request, background_tasks: BackgroundTasks, data: dict = Body(...)):
     filename = "security_report.pdf"
     try:
-        # FIX: Extract the actual payload if it's wrapped inside a "result" key
+        # 1. Unpack structure wrapper dynamically
         if "result" in data and isinstance(data["result"], dict):
             report_data = data["result"]
         else:
             report_data = data
 
-        # Ensure remediation field parsing targets the correct extracted dictionary
-        if "remediation" not in report_data:
+        # 2. Force Basic Text Fields Fallbacks
+        report_data["url"] = report_data.get("url", "N/A")
+        report_data["total_score"] = report_data.get("total_score", 0)
+        report_data["grade"] = report_data.get("grade", "N/A")
+
+        # 3. CRITICAL SANITIZATION: Fix the Loops
+        # Check remediation
+        if "remediation" not in report_data or report_data["remediation"] is None:
             report_data["remediation"] = report_data.get("reremediation", [])
-        if report_data["remediation"] is None:
-            report_data["remediation"] = []
+        
+        # Check subdomains loop type tracking
+        if "subdomains" in report_data and isinstance(report_data["subdomains"], list):
+            # If your PDF layout expects dictionaries but got raw strings, convert them safely:
+            sanitized_subs = []
+            for sub in report_data["subdomains"]:
+                if isinstance(sub, str):
+                    sanitized_subs.append({"url": sub, "domain": sub}) # Gives both common keys
+                else:
+                    sanitized_subs.append(sub)
+            report_data["subdomains"] = sanitized_subs
+        else:
+            report_data["subdomains"] = []
+
+        # Check missing headers tracking
+        if "missing_headers" in report_data and isinstance(report_data["missing_headers"], list):
+            sanitized_headers = []
+            for h in report_data["missing_headers"]:
+                if isinstance(h, str):
+                    sanitized_headers.append({"header": h, "name": h})
+                else:
+                    sanitized_headers.append(h)
+            report_data["missing_headers"] = sanitized_headers
+        else:
+            report_data["missing_headers"] = []
 
         logger.info(f"Compiling PDF Report payload data for target vector.")
         
-        # FIX: Pass the unwrapped report_data dictionary into your generator
+        # Safe compiled execution
         generate_pdf(report_data, filename)
 
-    except Exception as pdf_error:
-        logger.error(f"Error inside pdf_generator backend: {str(pdf_error)}")
-        raise HTTPException(status_code=500, detail=f"PDF Generator Error: {str(pdf_error)}")
+except Exception as pdf_error:
+    logger.error(f"Error inside pdf_generator backend: {str(pdf_error)}")
+    raise HTTPException(status_code=500, detail=f"PDF Generator Error: {str(pdf_error)}")
     
     if not os.path.exists(filename):
         raise HTTPException(status_code=500, detail="Generated report file missing from transient storage.")
