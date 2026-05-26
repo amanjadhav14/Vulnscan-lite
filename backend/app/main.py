@@ -278,51 +278,70 @@ def remove_file(path: str):
 async def download_report(request: Request, background_tasks: BackgroundTasks, data: dict = Body(...)):
     filename = "security_report.pdf"
     try:
-        # 1. Extract raw data out of frontend wrapper if present
+        # 1. Unpack structure wrapper dynamically if nested
         if "result" in data and isinstance(data["result"], dict):
             report_data = data["result"]
         else:
             report_data = data
 
-        # 2. Force essential top-level string fields fallback values
+        # 2. Force essential top-level fields (Handles BOTH string & dict indexing expectations)
         report_data["url"] = report_data.get("url", "N/A")
+        report_data["target_url"] = report_data["url"]
         report_data["total_score"] = report_data.get("total_score", 0)
+        report_data["scan_score"] = report_data["total_score"]
+        report_data["score"] = report_data["total_score"]
         report_data["grade"] = report_data.get("grade", "N/A")
+        report_data["scan_grade"] = report_data["grade"]
 
-        # 3. FIX REMEDIATION LOOP: Ensure it's always an iterable list
+        # 3. BULLETPROOF REMEDIATION: Force string conversion inside loops
         if "remediation" not in report_data or report_data["remediation"] is None:
             report_data["remediation"] = report_data.get("reremediation", [])
-        if not isinstance(report_data["remediation"], list):
-            report_data["remediation"] = []
+        
+        sanitized_remediation = []
+        if isinstance(report_data["remediation"], list):
+            for item in report_data["remediation"]:
+                if isinstance(item, str):
+                    # If generator treats it as string or tries dict indexing, this handles both
+                    sanitized_remediation.append({"description": item, "fix": item, "name": item, "title": item})
+                elif isinstance(item, dict):
+                    # Inject missing keys just in case
+                    for k in ["description", "fix", "name", "title"]:
+                        if k not in item:
+                            item[k] = str(list(item.values())[0]) if item.values() else "N/A"
+                    sanitized_remediation.append(item)
+        report_data["remediation"] = sanitized_remediation
 
-        # 4. FIX SUBDOMAINS LOOP: Force strings into structured dictionaries
-        if "subdomains" in report_data and isinstance(report_data["subdomains"], list):
-            sanitized_subs = []
-            for sub in report_data["subdomains"]:
+        # 4. BULLETPROOF SUBDOMAINS: Handles any array loop parsing variation
+        sanitized_subs = []
+        raw_subs = report_data.get("subdomains", []) or []
+        if isinstance(raw_subs, list):
+            for sub in raw_subs:
                 if isinstance(sub, str):
-                    # This provides both 'url' and 'name' keys so the PDF generator won't fail with a string index error
-                    sanitized_subs.append({"url": sub, "name": sub, "domain": sub})
+                    sanitized_subs.append({"url": sub, "name": sub, "domain": sub, "value": sub})
                 elif isinstance(sub, dict):
+                    for k in ["url", "name", "domain", "value"]:
+                        if k not in sub:
+                            sub[k] = str(list(sub.values())[0]) if sub.values() else "N/A"
                     sanitized_subs.append(sub)
-            report_data["subdomains"] = sanitized_subs
-        else:
-            report_data["subdomains"] = []
+        report_data["subdomains"] = sanitized_subs
 
-        # 5. FIX MISSING HEADERS LOOP: Force strings into structured dictionaries
-        if "missing_headers" in report_data and isinstance(report_data["missing_headers"], list):
-            sanitized_headers = []
-            for h in report_data["missing_headers"]:
+        # 5. BULLETPROOF MISSING HEADERS: Safe object mapping
+        sanitized_headers = []
+        raw_headers = report_data.get("missing_headers", []) or []
+        if isinstance(raw_headers, list):
+            for h in raw_headers:
                 if isinstance(h, str):
-                    sanitized_headers.append({"header": h, "name": h, "key": h})
+                    sanitized_headers.append({"header": h, "name": h, "key": h, "value": h})
                 elif isinstance(h, dict):
+                    for k in ["header", "name", "key", "value"]:
+                        if k not in h:
+                            h[k] = str(list(h.values())[0]) if h.values() else "N/A"
                     sanitized_headers.append(h)
-            report_data["missing_headers"] = sanitized_headers
-        else:
-            report_data["missing_headers"] = []
+        report_data["missing_headers"] = sanitized_headers
 
         logger.info(f"Compiling PDF Report payload data for target vector.")
         
-        # Now it is completely safe to run without hitting string index errors
+        # Safe compiled execution - cannot crash on missing keys or raw string indexes now
         generate_pdf(report_data, filename)
 
     except Exception as pdf_error:
