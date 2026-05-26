@@ -1,6 +1,12 @@
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer
+)
+
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
+
 
 def generate_pdf(data, filename):
 
@@ -11,50 +17,152 @@ def generate_pdf(data, filename):
 
     styles = getSampleStyleSheet()
 
-    content = []
+    elements = []
 
-    title = Paragraph(
-        "VulnScan Lite Security Report",
-        styles["Title"]
+    # TITLE
+    elements.append(
+        Paragraph(
+            "VulnScan Lite Security Report",
+            styles['Title']
+        )
     )
 
-    content.append(title)
-    content.append(Spacer(1, 20))
+    elements.append(Spacer(1, 20))
 
-    fields = [
-        f"Target URL: {data['url']}",
-        f"Security Grade: {data['grade']}",
-        f"Security Score: {data['total_score']}",
-        f"CMS: {data['cms']['cms']}",
-        f"Server: {data['cms']['server']}",
-        f"SSL Valid: {data['ssl']['ssl_valid']}",
-        f"SSL Days Left: {data['ssl']['days_left']}",
-    ]
-
-    for item in fields:
-
-        p = Paragraph(item, styles["BodyText"])
-        content.append(p)
-        content.append(Spacer(1, 10))
-
-    remediation_title = Paragraph(
-        "Security Recommendations",
-        styles["Heading2"]
+    # BASIC INFO
+    elements.append(
+        Paragraph(
+            f"Target URL: {data.get('url', 'N/A')}",
+            styles['BodyText']
+        )
     )
 
-    content.append(remediation_title)
+    elements.append(
+        Paragraph(
+            f"Security Grade: {data.get('grade', 'N/A')}",
+            styles['BodyText']
+        )
+    )
 
-    for fix in data["remediation"]:
+    elements.append(
+        Paragraph(
+            f"Security Score: {data.get('total_score', 0)}",
+            styles['BodyText']
+        )
+    )
 
-        text = f"""
-        <b>{fix['header']}</b><br/>
-        Risk: {fix['risk']}<br/>
-        Fix: {fix['fix']}
-        """
+    elements.append(Spacer(1, 20))
 
-        p = Paragraph(text, styles["BodyText"])
+    # VULNERABILITIES
+    elements.append(
+        Paragraph(
+            "Detected Vulnerabilities",
+            styles['Heading2']
+        )
+    )
 
-        content.append(p)
-        content.append(Spacer(1, 15))
+    vulnerabilities = data.get("vulnerabilities", [])
 
-    doc.build(content)
+    if isinstance(vulnerabilities, list):
+
+        for vuln in vulnerabilities:
+
+            if isinstance(vuln, dict):
+
+                title = vuln.get("title", "Unknown")
+                severity = vuln.get("severity", "Low")
+                description = vuln.get("description", "No description")
+
+            else:
+
+                title = str(vuln)
+                severity = "Unknown"
+                description = str(vuln)
+
+            elements.append(
+                Paragraph(
+                    f"<b>{title}</b> ({severity})",
+                    styles['BodyText']
+                )
+            )
+
+            elements.append(
+                Paragraph(
+                    description,
+                    styles['BodyText']
+                )
+            )
+
+            elements.append(Spacer(1, 12))
+
+    # REMEDIATION
+    elements.append(
+        Paragraph(
+            "Remediation Recommendations",
+            styles['Heading2']
+        )
+    )
+
+    remediation = data.get("remediation", [])
+
+    if isinstance(remediation, list):
+
+        for item in remediation:
+
+            if isinstance(item, dict):
+
+                fix = (
+                    item.get("fix")
+                    or item.get("description")
+                    or item.get("title")
+                    or "No recommendation"
+                )
+
+            else:
+
+                fix = str(item)
+
+            elements.append(
+                Paragraph(
+                    f"• {fix}",
+                    styles['BodyText']
+                )
+            )
+
+    elements.append(Spacer(1, 20))
+
+    # SUBDOMAINS
+    elements.append(
+        Paragraph(
+            "Discovered Subdomains",
+            styles['Heading2']
+        )
+    )
+
+    subdomains = data.get("subdomains", [])
+
+    if isinstance(subdomains, list):
+
+        for sub in subdomains:
+
+            if isinstance(sub, dict):
+
+                value = (
+                    sub.get("url")
+                    or sub.get("domain")
+                    or sub.get("name")
+                    or "Unknown"
+                )
+
+            else:
+
+                value = str(sub)
+
+            elements.append(
+                Paragraph(
+                    f"• {value}",
+                    styles['BodyText']
+                )
+            )
+
+    doc.build(elements)
