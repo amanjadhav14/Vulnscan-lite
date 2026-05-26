@@ -82,7 +82,7 @@ PDF ENGINE:
 DEPLOYMENT:
 
 * Render (Backend)
-* Vercel (Frontend)
+* Vercel (Frontend)  https://vulnscan-lite-jcgw1eopo-amanjadhav14s-projects.vercel.app/
 
 ========================================
 PROJECT STRUCTURE
@@ -114,7 +114,7 @@ INSTALLATION GUIDE
 
 1. Clone Repository
 
-git clone https://github.com/your-username/vulnscan-lite.git
+git clone https://github.com/amanjadhav14/Vulnscan-lite.git
 
 ========================================
 
